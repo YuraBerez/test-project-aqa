@@ -1,7 +1,7 @@
 import pytest
 import sys
 import os
-from selenium import webdriver
+from conftest import browser
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -9,23 +9,10 @@ from components.search_page import SearchPage
 
 # region Constants
 IMAGE_URL = 'https://www.theglobeandmail.com/resizer/gew4suGzG44SaHLq5yXVIoEY3Qc=/arc-anglerfish-tgam-prod-tgam/public/2XCT3JN7ZRGMNAFSMZM2RSTH2I.jpeg'
-RESULTS_FOLDER_PATH = './results'
 SCREENSHOT_FOLDER_PATH = os.path.join(RESULTS_FOLDER_PATH, 'screenshots')
+RESULTS_FOLDER_PATH = './results'
 # endregion
 
-# region pytest fixture
-@pytest.fixture
-def browser():
-    if not os.path.exists(RESULTS_FOLDER_PATH):
-        os.makedirs(RESULTS_FOLDER_PATH)
-
-    if not os.path.exists(SCREENSHOT_FOLDER_PATH):
-        os.makedirs(SCREENSHOT_FOLDER_PATH)
-
-    driver = webdriver.Chrome()
-    yield driver
-    driver.quit()
-# endregion
 
 # region test cases
 def test_search_input(browser):
