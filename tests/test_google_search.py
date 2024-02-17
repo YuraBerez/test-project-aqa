@@ -17,6 +17,7 @@ IMAGE_SEARCH_BUTTON_SELECTOR = 'div.nDcEnd > svg'
 IMAGE_SEARCH_URL_INPUT_SELECTOR = 'div.PXT6cd > input'
 # endregion
 
+# region pytest fixture
 @pytest.fixture
 def browser():
     if not os.path.exists(RESULTS_FOLDER_PATH):
@@ -28,7 +29,9 @@ def browser():
     driver = webdriver.Chrome()
     yield driver
     driver.quit()
+# endregion
 
+# region test cases
 def test_search_input(browser):
     browser.get("https://www.google.com/")
     search_input = browser.find_element(By.XPATH, SEARCH_INPUT_XPATH)
@@ -63,6 +66,7 @@ def test_image_search(browser):
     print(os.path.join(SCREENSHOT_FOLDER_PATH, 'test_image_search_2.png'))
 
     assert "honda" in browser.page_source
+# endregion
 
 if __name__ == "__main__":
     pytest.main(["-v", "--html=" + RESULTS_FOLDER_PATH + '/report.html'])
