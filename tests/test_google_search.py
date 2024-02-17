@@ -1,20 +1,16 @@
 import pytest
-import time
+import sys
 import os
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# region Contants
+from components.search_page import SearchPage
+
+# region Constants
 IMAGE_URL = 'https://www.theglobeandmail.com/resizer/gew4suGzG44SaHLq5yXVIoEY3Qc=/arc-anglerfish-tgam-prod-tgam/public/2XCT3JN7ZRGMNAFSMZM2RSTH2I.jpeg'
 RESULTS_FOLDER_PATH = './results'
-SCREENSHOT_FOLDER_PATH = os.path.join(RESULTS_FOLDER_PATH, 'screenshots') 
-
-SEARCH_INPUT_XPATH = '//*[@id="APjFqb"]'
-CLEAR_SEARCH_INPUT_BUTTON_SELECTOR = 'div.BKRPef > div'
-IMAGE_SEARCH_BUTTON_SELECTOR = 'div.nDcEnd > svg'
-IMAGE_SEARCH_URL_INPUT_SELECTOR = 'div.PXT6cd > input'
+SCREENSHOT_FOLDER_PATH = os.path.join(RESULTS_FOLDER_PATH, 'screenshots')
 # endregion
 
 # region pytest fixture
@@ -33,41 +29,29 @@ def browser():
 
 # region test cases
 def test_search_input(browser):
-    browser.get("https://www.google.com/")
-    search_input = browser.find_element(By.XPATH, SEARCH_INPUT_XPATH)
-    search_input.send_keys('Python')
-    search_input.send_keys(Keys.ENTER)
-    time.sleep(1)
+    search_page = SearchPage(browser)
+    search_page.open()
+    search_page.search_for('Python')
     browser.save_screenshot(os.path.join(SCREENSHOT_FOLDER_PATH, 'test_search_input.png'))
 
     assert "Python" in browser.page_source
 
 def test_clear_input_button(browser):
-    browser.get("https://www.google.com/")
-    search_input = browser.find_element(By.XPATH, SEARCH_INPUT_XPATH)
-    clear_button = browser.find_element(By.CSS_SELECTOR, CLEAR_SEARCH_INPUT_BUTTON_SELECTOR)
-    search_input.send_keys('Python')
-    clear_button.click()
+    search_page = SearchPage(browser)
+    search_page.open()
+    search_page.clear_search_input()
     browser.save_screenshot(os.path.join(SCREENSHOT_FOLDER_PATH, 'test_clear_input_button.png'))
 
-    assert search_input.text == ''
+    assert search_page.get_search_input_value() == ''
 
 def test_image_search(browser):
-    browser.get("https://www.google.com/")
-    image_search_button = browser.find_element(By.CSS_SELECTOR, IMAGE_SEARCH_BUTTON_SELECTOR) 
-    image_search_button.click()
-    time.sleep(0.5)
-    browser.save_screenshot(os.path.join(SCREENSHOT_FOLDER_PATH, 'test_image_search_1.png'))
-    image_link_input = browser.find_element(By.CSS_SELECTOR, IMAGE_SEARCH_URL_INPUT_SELECTOR)
-    image_link_input.send_keys(IMAGE_URL)
-    image_link_input.send_keys(Keys.ENTER)
-    browser.save_screenshot(os.path.join(SCREENSHOT_FOLDER_PATH, 'test_image_search_2.png'))
-
-    print(os.path.join(SCREENSHOT_FOLDER_PATH, 'test_image_search_2.png'))
+    search_page = SearchPage(browser)
+    search_page.open()
+    search_page.perform_image_search(IMAGE_URL)
+    browser.save_screenshot(os.path.join(SCREENSHOT_FOLDER_PATH, 'test_image_search.png'))
 
     assert "honda" in browser.page_source
 # endregion
 
 if __name__ == "__main__":
     pytest.main(["-v", "--html=" + RESULTS_FOLDER_PATH + '/report.html'])
-
